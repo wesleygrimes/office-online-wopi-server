@@ -1,3 +1,5 @@
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using office_online_wopi_server.Models;
@@ -17,7 +19,15 @@ namespace office_online_wopi_server.Controllers
         public async Task<IActionResult> GetFile(string id)
         {
             var file = new byte[] { };
-            return File(file, "application/octet-stream");
+            var files = Directory.GetFiles("sample_files", $"*{id}*.*");
+
+            if (files.Any())
+            {
+                file = await System.IO.File.ReadAllBytesAsync(files[0]);
+            }
+
+            var fileName = Path.GetFileName(files[0]);
+            return File(file, "application/octet-stream", fileName);
         }
 
         [HttpPut("{id}/contents")]
